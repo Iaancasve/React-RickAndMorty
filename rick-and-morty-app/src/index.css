@@ -63,3 +63,19 @@ body {
   margin: 0;
   font-weight: bold;
 }
+
+.loading-text {
+  color: #00b5cc;
+  font-weight: bold;
+  text-align: center;
+  font-size: 1.2rem;
+}
+
+.error-text {
+  color: #ff4444;
+  background: rgba(255, 0, 0, 0.1);
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
+  border: 1px solid #ff4444;
+}

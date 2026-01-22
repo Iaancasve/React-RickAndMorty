@@ -1,46 +1,68 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getCharactersAction } from "../actions/get-characters.actions";
 import type { Character } from "../interfaces/character.interface";
 
 export const useCharacters = () => {
   const [characters, setCharacters] = useState<Character[]>([]);
   const [previousTerms, setPreviousTerms] = useState<string[]>([]);
+  
+  // Añadimos estados de carga y error
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Con useRef mantenemos la referencia entre renderizados (no se pierde al hacer rerender)
   const charCache = useRef<Record<string, Character[]>>({});
 
-  const handleTermClicked = async (term: string = "") => {
-    if (charCache.current[term]) {
-      setCharacters(charCache.current[term]);
-      return;
+  // Función interna para centralizar la carga de datos
+  const fetchCharacters = async (query: string) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      if (charCache.current[query]) {
+        setCharacters(charCache.current[query]);
+        setIsLoading(false);
+        return;
+      }
+
+      const chars = await getCharactersAction(query);
+      setCharacters(chars);
+      charCache.current[query] = chars;
+    } catch (err) {
+      setError("No se encontraron personajes o hubo un error en la API");
+      setCharacters([]);
+    } finally {
+      setIsLoading(false);
     }
-    const chars = await getCharactersAction(term);
-    setCharacters(chars);
+  };
+
+  // Carga inicial de datos al montar el componente
+  useEffect(() => {
+    fetchCharacters(""); 
+  }, []);
+
+  const handleTermClicked = async (term: string = "") => {
+    await fetchCharacters(term);
   };
 
   const handleSearch = async (query: string) => {
-    // Comprobar si query es vacío
     query = query.trim().toLowerCase();
     if (query.length === 0) return;
-
-    // Comprobar si el término ya existe en previousTerms
-    if (previousTerms.includes(query)) return;
     
-    // Mantenemos los últimos 7 términos
-    setPreviousTerms([query, ...previousTerms].slice(0, 7));
+    // Evitamos duplicados en búsquedas previas
+    if (!previousTerms.includes(query)) {
+        setPreviousTerms([query, ...previousTerms].slice(0, 7));
+    }
 
-    const chars = await getCharactersAction(query);
-    setCharacters(chars);
-
-    // Guardar en caché
-    charCache.current[query] = chars;
+    await fetchCharacters(query);
   };
 
   return {
-    // Properties / Values
+    // Properties
     characters,
     previousTerms,
-    // Methods / Actions
+    isLoading, 
+    error,     
+    // Methods
     handleSearch,
     handleTermClicked,
   };
