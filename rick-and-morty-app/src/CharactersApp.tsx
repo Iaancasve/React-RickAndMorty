@@ -1,23 +1,26 @@
 import { useCharacters } from "./characters/hooks/useCharacters";
+import { SearchBar } from "../src/shared/components/searchBar";
 
 export const CharactersApp = () => {
-  // Usamos el hook 
   const { characters, handleSearch } = useCharacters();
 
   return (
     <>
-      <h1>Rick and Morty App</h1>
+      <h1>Rick and Morty Explorer</h1>
       
-      {/* Botón temporal para probar que la API funciona */}
-      <button onClick={() => handleSearch('rick')}>
-        Probar búsqueda (Rick)
-      </button>
+      <SearchBar 
+        placeholder="Busca un personaje (ej. Rick, Morty...)" 
+        onQuery={handleSearch} 
+      />
 
-      <ul>
-        {characters.map(char => (
-          <li key={char.id}>{char.name}</li>
+      <div className="character-grid">
+        {characters.map((char) => (
+          <div key={char.id} className="character-card">
+            <img src={char.image} alt={char.name} />
+            <p>{char.name}</p>
+          </div>
         ))}
-      </ul>
+      </div>
     </>
   );
 };
