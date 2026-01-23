@@ -11,7 +11,7 @@ export const useCharacters = () => {
   // Con useRef mantenemos la referencia entre renderizados
   const charCache = useRef<Record<string, Character[]>>({});
 
-  // Carga inicial (Requisito 1 de la práctica)
+  // Carga inicial
   useEffect(() => {
     handleSearch("", "");
   }, []);
@@ -40,7 +40,7 @@ export const useCharacters = () => {
     // Comprobar si query es vacío (solo para el historial de términos previos)
     const cleanQuery = query.trim().toLowerCase();
     
-    // Gestión de términos previos igual que la profesora
+    
     if (cleanQuery.length > 0 && !previousTerms.includes(cleanQuery)) {
       setPreviousTerms([cleanQuery, ...previousTerms].slice(0, 7));
     }

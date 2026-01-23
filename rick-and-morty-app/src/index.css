@@ -6,7 +6,7 @@ body {
   padding: 20px;
 }
 
-/* Contenedor del buscador (visto en el SearchBar de la profesora) */
+/* Contenedor del buscador */
 .search-container {
   display: flex;
   gap: 10px;
@@ -104,4 +104,69 @@ body {
 
 .filters-container button:hover {
   background: rgba(0, 181, 204, 0.2);
+}
+
+.app-container {
+  display: flex;
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.main-content {
+  flex: 2;
+}
+
+.sidebar {
+  flex: 1;
+  position: sticky;
+  top: 20px;
+  height: fit-content;
+}
+
+.character-card.selected {
+  border: 2px solid #00b5cc;
+  box-shadow: 0 0 10px #00b5cc;
+}
+
+.character-detail-card {
+  background: #333;
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid #444;
+}
+
+.character-detail-card img {
+  width: 100%;
+  border-radius: 5px;
+}
+
+.detail-placeholder {
+  color: #888;
+  font-style: italic;
+  text-align: center;
+  padding: 20px;
+  border: 2px dashed #444;
+}
+
+.previous-searches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.search-tag {
+  background: #444;
+  border: none;
+  color: #00b5cc;
+  padding: 5px 12px;
+  border-radius: 15px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.2s;
+}
+
+.search-tag:hover {
+  background: #555;
 }

@@ -1,51 +1,63 @@
-import { useState } from "react";
-import { useCharacters } from "./characters/hooks/useCharacters";
-import { SearchBar } from "./shared/components/searchBar";
+import { CharacterList } from "./characters/components/CharacterList";
+import { CharacterDetail } from "./characters/components/CharacterDetail";
 import { StatusFilters } from "./characters/components/StatusFilters";
+import { CustomHeader } from "./shared/components/CustomHeader";
+import { SearchBar } from "./shared/components/searchBar";
+import { useCharacters } from "./characters/hooks/useCharacters";
+import { useState } from "react";
+import type { Character } from "./characters/interfaces/character.interface";
+import { PreviousSearches } from "./characters/components/PreviousSearch";
 
 export const CharactersApp = () => {
-  const { characters, handleSearch, isLoading, error } = useCharacters();
-  const [filterStatus, setFilterStatus] = useState('');
-  const [currentName, setCurrentName] = useState('');
+  
+  const { 
+    characters, 
+    previousTerms, 
+    handleSearch, 
+    handleTermClicked,
+    isLoading,
+    error 
+  } = useCharacters();
 
-  const onSearchQuery = (name: string) => {
-    setCurrentName(name);
-    handleSearch(name, filterStatus); // Combinamos nombre y filtro
-  };
-
-  const onStatusChange = (status: string) => {
-    setFilterStatus(status);
-    handleSearch(currentName, status); // Combinamos nombre y filtro
-  };
+  const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null);
 
   return (
-    <>
-      <h1>Rick and Morty Explorer</h1>
+    <div className="app-container">
+      <div className="main-content">
+        
+        <CustomHeader 
+          title="Rick and Morty Explorer"
+          description="Encuentra a tus personajes favoritos de la serie"
+        />
+
+        <SearchBar
+          placeholder="Busca un personaje..."
+          onQuery={handleSearch}
+        />
+
+        <PreviousSearches 
+          searches={previousTerms} 
+          onLabelClicked={handleTermClicked} 
+        />
+        
+        <StatusFilters 
+          onStatusChange={(status) => handleSearch('', status)} 
+          currentStatus="" 
+        />
+
       
-      <SearchBar 
-        placeholder="Busca un personaje..." 
-        onQuery={onSearchQuery} 
-      />
+        { isLoading && <p className="loading-text">Cargando...</p> }
+        { error && <p className="error-text">{ error }</p> }
 
-      <StatusFilters 
-        currentStatus={filterStatus}
-        onStatusChange={onStatusChange}
-      />
-
-      { isLoading && <p className="loading-text">Cargando personajes...</p> }
-      { error && <p className="error-text">{ error }</p> }
-
-      <div className="character-grid">
-        { !isLoading && characters.map((char) => (
-          <div key={char.id} className="character-card">
-            <img src={char.image} alt={char.name} />
-            <p>{char.name}</p>
-            <small style={{display: 'block', paddingBottom: '10px'}}>
-               {char.status} - {char.species}
-            </small>
-          </div>
-        ))}
+        <CharacterList 
+          characters={characters} 
+          onCharacterSelected={setSelectedCharacter}
+        />
       </div>
-    </>
+
+      <aside className="sidebar">
+        <CharacterDetail character={selectedCharacter} />
+      </aside>
+    </div>
   );
 };
