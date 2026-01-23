@@ -5,64 +5,75 @@ import type { Character } from "../interfaces/character.interface";
 export const useCharacters = () => {
   const [characters, setCharacters] = useState<Character[]>([]);
   const [previousTerms, setPreviousTerms] = useState<string[]>([]);
-  
-  // Añadimos estados de carga y error
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Con useRef mantenemos la referencia entre renderizados
   const charCache = useRef<Record<string, Character[]>>({});
 
-  // Función interna para centralizar la carga de datos
-  const fetchCharacters = async (query: string) => {
+  // Carga inicial (Requisito 1 de la práctica)
+  useEffect(() => {
+    handleSearch("", "");
+  }, []);
+
+  const handleTermClicked = async (term: string = "", status: string = "") => {
+    const cacheKey = `${term}-${status}`;
+
+    if (charCache.current[cacheKey]) {
+      setCharacters(charCache.current[cacheKey]);
+      return;
+    }
+
     try {
       setIsLoading(true);
-      setError(null);
-
-      if (charCache.current[query]) {
-        setCharacters(charCache.current[query]);
-        setIsLoading(false);
-        return;
-      }
-
-      const chars = await getCharactersAction(query);
+      const chars = await getCharactersAction(term, status);
       setCharacters(chars);
-      charCache.current[query] = chars;
+      charCache.current[cacheKey] = chars;
     } catch (err) {
-      setError("No se encontraron personajes o hubo un error en la API");
-      setCharacters([]);
+      setError("Error al cargar personajes");
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Carga inicial de datos al montar el componente
-  useEffect(() => {
-    fetchCharacters(""); 
-  }, []);
-
-  const handleTermClicked = async (term: string = "") => {
-    await fetchCharacters(term);
-  };
-
-  const handleSearch = async (query: string) => {
-    query = query.trim().toLowerCase();
-    if (query.length === 0) return;
+  const handleSearch = async (query: string, status: string = "") => {
+    // Comprobar si query es vacío (solo para el historial de términos previos)
+    const cleanQuery = query.trim().toLowerCase();
     
-    // Evitamos duplicados en búsquedas previas
-    if (!previousTerms.includes(query)) {
-        setPreviousTerms([query, ...previousTerms].slice(0, 7));
+    // Gestión de términos previos igual que la profesora
+    if (cleanQuery.length > 0 && !previousTerms.includes(cleanQuery)) {
+      setPreviousTerms([cleanQuery, ...previousTerms].slice(0, 7));
     }
 
-    await fetchCharacters(query);
+    const cacheKey = `${cleanQuery}-${status}`;
+    
+    // Verificación de caché
+    if (charCache.current[cacheKey]) {
+        setCharacters(charCache.current[cacheKey]);
+        return;
+    }
+
+    try {
+        setIsLoading(true);
+        setError(null);
+        const chars = await getCharactersAction(cleanQuery, status);
+        setCharacters(chars);
+        charCache.current[cacheKey] = chars;
+    } catch (err) {
+        setError("No se encontraron personajes");
+        setCharacters([]);
+    } finally {
+        setIsLoading(false);
+    }
   };
 
   return {
-    // Properties
+    // Properties / Values
     characters,
     previousTerms,
-    isLoading, 
-    error,     
-    // Methods
+    isLoading,
+    error,
+    // Methods / Actions
     handleSearch,
     handleTermClicked,
   };

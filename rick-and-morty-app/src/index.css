@@ -79,3 +79,29 @@ body {
   text-align: center;
   border: 1px solid #ff4444;
 }
+
+.filters-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  justify-content: center;
+}
+
+.filters-container button {
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid #00b5cc;
+  background: transparent;
+  color: #00b5cc;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.filters-container button.active {
+  background: #00b5cc;
+  color: white;
+}
+
+.filters-container button:hover {
+  background: rgba(0, 181, 204, 0.2);
+}
