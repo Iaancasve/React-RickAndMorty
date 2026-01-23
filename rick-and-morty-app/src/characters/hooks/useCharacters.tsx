@@ -8,10 +8,12 @@ export const useCharacters = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Con useRef mantenemos la referencia entre renderizados
   const charCache = useRef<Record<string, Character[]>>({});
+  
+  
+  // Lo usamos para contar cuántas veces hemos ido a la API de verdad
+  const apiCallCount = useRef(0);
 
-  // Carga inicial
   useEffect(() => {
     handleSearch("", "");
   }, []);
@@ -27,6 +29,11 @@ export const useCharacters = () => {
     try {
       setIsLoading(true);
       const chars = await getCharactersAction(term, status);
+      
+      // Incrementamos la persistencia
+      apiCallCount.current++;
+      console.log(`Peticiones realizadas a la API: ${apiCallCount.current}`);
+      
       setCharacters(chars);
       charCache.current[cacheKey] = chars;
     } catch (err) {
@@ -37,9 +44,7 @@ export const useCharacters = () => {
   };
 
   const handleSearch = async (query: string, status: string = "") => {
-    // Comprobar si query es vacío (solo para el historial de términos previos)
     const cleanQuery = query.trim().toLowerCase();
-    
     
     if (cleanQuery.length > 0 && !previousTerms.includes(cleanQuery)) {
       setPreviousTerms([cleanQuery, ...previousTerms].slice(0, 7));
@@ -47,7 +52,6 @@ export const useCharacters = () => {
 
     const cacheKey = `${cleanQuery}-${status}`;
     
-    // Verificación de caché
     if (charCache.current[cacheKey]) {
         setCharacters(charCache.current[cacheKey]);
         return;
@@ -57,6 +61,11 @@ export const useCharacters = () => {
         setIsLoading(true);
         setError(null);
         const chars = await getCharactersAction(cleanQuery, status);
+        
+        // Actualizamos el valor persistente
+        apiCallCount.current++;
+        console.log(`Peticiones realizadas a la API: ${apiCallCount.current}`);
+
         setCharacters(chars);
         charCache.current[cacheKey] = chars;
     } catch (err) {
@@ -68,12 +77,10 @@ export const useCharacters = () => {
   };
 
   return {
-    // Properties / Values
     characters,
     previousTerms,
     isLoading,
     error,
-    // Methods / Actions
     handleSearch,
     handleTermClicked,
   };
