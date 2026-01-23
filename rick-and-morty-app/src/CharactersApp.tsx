@@ -1,12 +1,12 @@
+import { useState } from "react";
 import { CharacterList } from "./characters/components/CharacterList";
 import { CharacterDetail } from "./characters/components/CharacterDetail";
 import { StatusFilters } from "./characters/components/StatusFilters";
 import { CustomHeader } from "./shared/components/CustomHeader";
 import { SearchBar } from "./shared/components/searchBar";
 import { useCharacters } from "./characters/hooks/useCharacters";
-import { useState } from "react";
-import type { Character } from "./characters/interfaces/character.interface";
 import { PreviousSearches } from "./characters/components/PreviousSearch";
+import type { Character } from "./characters/interfaces/character.interface";
 
 export const CharactersApp = () => {
   
@@ -15,6 +15,7 @@ export const CharactersApp = () => {
     previousTerms, 
     handleSearch, 
     handleTermClicked,
+    loadNextPage, 
     isLoading,
     error 
   } = useCharacters();
@@ -45,7 +46,6 @@ export const CharactersApp = () => {
           currentStatus="" 
         />
 
-      
         { isLoading && <p className="loading-text">Cargando...</p> }
         { error && <p className="error-text">{ error }</p> }
 
@@ -53,6 +53,12 @@ export const CharactersApp = () => {
           characters={characters} 
           onCharacterSelected={setSelectedCharacter}
         />
+
+        { !isLoading && characters.length > 0 && (
+          <button className="load-more-btn" onClick={loadNextPage}>
+            Cargar más personajes
+          </button>
+        )}
       </div>
 
       <aside className="sidebar">

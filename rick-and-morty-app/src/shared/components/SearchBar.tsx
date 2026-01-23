@@ -8,22 +8,21 @@ interface Props {
 export const SearchBar = ({ placeholder = "Buscar", onQuery }: Props) => {
   const [query, setQuery] = useState('');
   
-  // Añadimos useRef para cumplir el requisito 4 de la práctica: Foco automático
+  
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Requisito 4: Enfoque automático sin provocar re-renders innecesarios
+  
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
 
-  // Lógica de la profesora: Debouncer para buscar automáticamente
+  
   useEffect(() => {
-    if (query.trim().length === 0) return; // Evitamos búsquedas vacías automáticas
+    if (query.trim().length === 0) return; 
 
     const timeoutId = setTimeout(() => {
       onQuery(query);
-      // Nota: Si quieres que el texto NO se borre mientras escribes, 
-      // podrías comentar la siguiente línea, pero la pongo porque así lo tiene ella.
+      
       setQuery(""); 
     }, 700);
 
