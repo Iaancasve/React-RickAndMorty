@@ -1,13 +1,12 @@
 import { rickMortyApi } from '../api/rickmorty.api';
 import type { Character } from '../interfaces/character.interface';
 
-export const getCharactersAction = async (name: string = '', status: string = '', page: number = 1): Promise<Character[]> => {
+export const getCharactersAction = async (name: string = '', status: string = '',): Promise<Character[]> => {
     
     const response = await rickMortyApi.get('/character', {
         params: {
             name: name,
             status: status,
-            page
         }
     });
 
